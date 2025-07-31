@@ -58,7 +58,7 @@ onMounted(() => {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
         // 设置样式
-        ctx.fillStyle = "#282828";
+        ctx.fillStyle = "#646cff";
 
         // 绘制频谱图
         const len = dataArray.length;
