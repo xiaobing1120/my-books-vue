@@ -1,9 +1,17 @@
 <script setup>
-  import { ref, onMounted } from 'vue'
+  import { ref, onMounted, reactive, watch } from 'vue'
   defineProps({
     msg: String,
   })
   const count = ref(0)
+  const num = ref(0)
+  let panner = reactive({
+    pan: { value: -1 }
+  })
+
+  watch(num,(value) => {
+    panner.pan.value = value
+  })
 
   let audioContext = null
   let analyser = null
@@ -16,9 +24,9 @@
   const draw = () => {
     requestAnimationFrame(draw);
 
-    /* if(!analyser?.getByteFrequencyData){
+    if(!analyser?.getByteFrequencyData){
       return
-    } */
+    }
     // console.log('dataArray', dataArray)
 
     // 获取音频数据
@@ -39,6 +47,7 @@
     const len = dataArray.length;
     const barWidth = canvas.width / len;
 
+    // ctx.beginPath()
     for (let i = 0; i < len; i++) {
       const data = dataArray[i];
       const barHeight = (data / 2 ** 9) * canvas.height;
@@ -48,7 +57,18 @@
 
       // 绘制矩形
       ctx.fillRect(x, y, barWidth, barHeight);
+
+      /*if(y <= 0){
+        return;
+      }
+      if (i === 0) {
+        ctx.moveTo(x, y);
+      } else {
+        ctx.lineTo(x, y);
+      }*/
     }
+    // ctx.stroke();
+
   }
 
   const onStart1 = () => {
@@ -59,8 +79,10 @@
       return;
     }
 
-    canvas.width = window.innerWidth * devicePixelRatio;
-    canvas.height = (window.innerHeight / 2) * devicePixelRatio;
+    // canvas.width = window.innerWidth * devicePixelRatio;
+    // canvas.height = (window.innerHeight / 2) * devicePixelRatio;
+    canvas.width = 1000;
+    canvas.height = 400;
     ctx = canvas.getContext("2d");
 
     navigator.mediaDevices.getUserMedia({ audio: {
@@ -168,7 +190,6 @@
   }
 
 
-
   const onStart = () => {
     console.log('start')
     canvas = document.getElementById("audioCanvas");
@@ -177,25 +198,29 @@
       console.error('Canvas not found')
       return
     }
-    canvas.width = window.innerWidth * devicePixelRatio;
-    canvas.height = (window.innerHeight / 2) * devicePixelRatio;
+    // canvas.width = window.innerWidth * devicePixelRatio;
+    // canvas.height = (window.innerHeight / 2) * devicePixelRatio;
+    canvas.width = 1000;
+    canvas.height = 400;
     ctx = canvas.getContext("2d");
   }
 
+  // 开始播放
   const startAudioAnalysis = () => {
 
-    // 创建 AudioContext 对象
-    audioContext = new (window.AudioContext || window.webkitAudioContext)();
-
-    if (!audioContext) {
-      console.error("Web Audio API is not supported in this browser");
-      return;
-    }
+    if(audioContext) return;
 
     const video = document.getElementById('video')
     if (!video) {
       console.error('video element not found')
       return
+    }
+
+    // 创建 AudioContext 对象
+    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    if (!audioContext) {
+      console.error("Web Audio API is not supported in this browser");
+      return;
     }
 
     // 创建 MediaElementAudioSourceNode
@@ -211,9 +236,14 @@
     dataArray = new Uint8Array(bufferLength);
     // const dataArray = new Float32Array(bufferLength);
 
+    panner = audioContext.createStereoPanner();
+    panner.pan.value = -1; // 声音偏向左声道   -1  完全左声道,  1 完全右声道
+
     // 连接到 AudioContext
-    source.connect(analyser);
-    analyser.connect(audioContext.destination) // 可选：输出到扬声器
+    source.connect(panner).connect(analyser);
+    console.log('audioContext.destination', audioContext.destination)
+    // 可选：输出到扬声器
+    analyser.connect(audioContext.destination)
 
     draw()
   }
@@ -225,10 +255,12 @@
 
 <template>
   <h1>{{ msg }}</h1>
+  <video id="video" src="../assets/崔子格-卜卦.mp3" controls autoplay @play="startAudioAnalysis"></video>
   <canvas id="audioCanvas"></canvas>
 
-  <img src="../assets/vue.svg" />
-  <video id="video" src="../assets/崔子格-卜卦.mp3" controls autoplay @play="startAudioAnalysis"></video>
+  {{num}}
+  <input type="range" min="-1" max="1" step="0.1" v-model="num" >
+
   <div class="card">
     <button type="button" @click="count++">count is {{ count }}</button>
   </div>
