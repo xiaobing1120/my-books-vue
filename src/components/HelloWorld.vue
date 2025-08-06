@@ -208,7 +208,7 @@
   // 开始播放
   const startAudioAnalysis = () => {
 
-    if(audioContext) return;
+    console.log('1111')
 
     const video = document.getElementById('video')
     if (!video) {
@@ -216,18 +216,33 @@
       return
     }
 
-    // 创建 AudioContext 对象
-    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    if(audioContext) {
+      return;
+    }
+
+    if(!audioContext) {
+      // 创建 AudioContext 对象
+      audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    }
     if (!audioContext) {
       console.error("Web Audio API is not supported in this browser");
       return;
     }
 
-    // 创建 MediaElementAudioSourceNode
-    source = audioContext.createMediaElementSource(video)
+    // 创建一个增益Node
+    const gainNode = audioContext.createGain();
+    gainNode.gain.value = 1;
 
-    // 创建 AnalyserNode
-    analyser = audioContext.createAnalyser();
+
+    if(!source){
+      // 创建 MediaElementAudioSourceNode
+      source = audioContext.createMediaElementSource(video)
+    }
+
+    if(!analyser){
+      // 创建 AnalyserNode
+      analyser = audioContext.createAnalyser();
+    }
 
     // 设置 AnalyserNode 的参数
     analyser.fftSize = 2 ** 9; // [32, 32768]
@@ -237,13 +252,14 @@
     // const dataArray = new Float32Array(bufferLength);
 
     panner = audioContext.createStereoPanner();
-    panner.pan.value = -1; // 声音偏向左声道   -1  完全左声道,  1 完全右声道
+    panner.pan.value = 0; // 声音偏向左声道   -1  完全左声道,  1 完全右声道
 
     // 连接到 AudioContext
-    source.connect(panner).connect(analyser);
+    source.connect(panner).connect(gainNode).connect(analyser);
     console.log('audioContext.destination', audioContext.destination)
     // 可选：输出到扬声器
-    analyser.connect(audioContext.destination)
+    // analyser.connect(audioContext.destination)
+    source.connect(audioContext.destination)
 
     draw()
   }
@@ -255,11 +271,12 @@
 
 <template>
   <h1>{{ msg }}</h1>
-  <video id="video" src="../assets/崔子格-卜卦.mp3" controls autoplay @play="startAudioAnalysis"></video>
-  <canvas id="audioCanvas"></canvas>
-
+  <video id="video" src="../assets/111.mp3" controls autoplay @play="startAudioAnalysis"></video>
   {{num}}
   <input type="range" min="-1" max="1" step="0.1" v-model="num" >
+  <canvas id="audioCanvas"></canvas>
+
+
 
   <div class="card">
     <button type="button" @click="count++">count is {{ count }}</button>
