@@ -13,15 +13,46 @@
         audioContext.value.resume()
       }
 
+      // 创建分析器节点
+      const analyser = audioContext.value.createAnalyser();
+      analyser.fftSize = 2048;
+      const bufferLength = analyser.frequencyBinCount;
+      const dataArray = new Uint8Array(bufferLength);
+
+      // 创建一个低通滤波器以去除高音（通常是人声的频率范围）
+      const lowpassFilter = audioContext.value.createBiquadFilter();
+      lowpassFilter.type = 'lowpass';
+      lowpassFilter.frequency.value = 500; // 设置截止频率，根据需要调整
+
+      // 创建高通滤波器（去除低频）
+      const highpassFilter = audioContext.value.createBiquadFilter();
+      highpassFilter.type = 'highpass';
+      highpassFilter.frequency.value = 2000; // 截止频率为 3kHz
+
+      // 创建带阻滤波器（去除中频）
+      const bandstopFilter = audioContext.value.createBiquadFilter();
+      bandstopFilter.type = 'notch'; // 带阻滤波器类型
+      bandstopFilter.frequency.value = 1000; // 中心频率（人声主要频率范围）
+      bandstopFilter.Q.value = 1; // 控制过滤范围（值越小，过滤范围越宽）
+
       // 创建新的音频源节点
-      const newSource = audioContext.value.createBufferSource()
-      newSource.buffer = audioBuffer.value
+      const source = audioContext.value.createBufferSource()
+      source.buffer = audioBuffer.value
 
       // 连接到扬声器
-      newSource.connect(audioContext.value.destination)
+      // source.connect(audioContext.value.destination)
 
       // 开始播放
-      newSource.start(0)
+      // source.start(0)
+
+
+      source.connect(analyser);
+      analyser.connect(bandstopFilter);
+      bandstopFilter.connect(lowpassFilter);
+      lowpassFilter.connect(highpassFilter);
+      highpassFilter.connect(audioContext.value.destination);
+
+      source.start(0, 100);
 
       console.log('音频开始播放')
     } catch (error) {
@@ -48,10 +79,9 @@
     // 解码音频数据
     // audioBuffer.value = await audioContext.value.decodeAudioData(arrayBuffer);
 
-    audioContext.value.decodeAudioData(arrayBuffer).then(res => {
-      console.log('解码后的音频缓冲区:', res)
-      audioBuffer.value = res
-    })
+    audioBuffer.value = await audioContext.value.decodeAudioData(arrayBuffer)
+
+
 
     console.log('解码后的音频缓冲区:', audioBuffer.value)
 
