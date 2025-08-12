@@ -1,10 +1,12 @@
 <script setup>
+
 </script>
 
 <template>
-  <!-- 路由出口，匹配的组件会在这里显示 -->
+  123
   <router-view></router-view>
 </template>
 
 <style scoped lang="less">
+
 </style>
