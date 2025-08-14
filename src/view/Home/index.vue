@@ -4,8 +4,23 @@
     name: 'Home'
   })
 
-  const jsonData = ref('{"name":"John","age":30,"car":null}')
-  const serializationJsonData = ref({"name":"John","age":30,"car":null, a: "{b: '123'}"})
+  const data = {
+    "name": "John",
+    "age": 30,
+    "car": null,
+    "a": {
+      "bc": 123
+    },
+    "b": "{\"cd\":234}",
+    "c": [
+      {
+        "a": "{\"c\":1}"
+      }
+    ]
+  }
+
+  const jsonData = ref(JSON.stringify(data))
+  const serializationJsonData = ref(data)
 
   onMounted(() => {
     console.log('Home')
@@ -14,9 +29,10 @@
   watch(jsonData,() => {
     console.log(111, typeof jsonData.value)
     console.log(222, jsonData.value)
-    serializationJsonData.value = JSON.parse(JSON.parse(JSON.stringify(JSON.stringify(jsonData.value)), (key, value) => {
+    serializationJsonData.value = JSON.parse(jsonData.value, (key, value) => {
       // 检查值是否为字符串且内容是有效的JSON
       if (typeof value === 'string') {
+        console.log(333, value)
         try {
           // 尝试解析字符串为JSON
           const parsedValue = JSON.parse(value);
@@ -29,7 +45,7 @@
       }
       // 非字符串值直接返回
       return value;
-    }))
+    })
   })
 
 
