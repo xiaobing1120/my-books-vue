@@ -22,20 +22,14 @@
   const jsonData = ref(JSON.stringify(data))
   const serializationJsonData = ref(data)
 
-  onMounted(() => {
-    console.log('Home')
-  })
-
-  watch(jsonData,() => {
-    console.log(111, typeof jsonData.value)
-    console.log(222, jsonData.value)
-    serializationJsonData.value = JSON.parse(jsonData.value, (key, value) => {
+  const jSONParse = (str) => {
+    return JSON.parse(str, (key, value) => {
       // 检查值是否为字符串且内容是有效的JSON
       if (typeof value === 'string') {
         console.log(333, value)
         try {
           // 尝试解析字符串为JSON
-          const parsedValue = JSON.parse(value);
+          const parsedValue = jSONParse(value);
           // 如果解析成功，返回解析后的对象
           return parsedValue;
         } catch (e) {
@@ -46,6 +40,16 @@
       // 非字符串值直接返回
       return value;
     })
+  }
+
+  onMounted(() => {
+    console.log('Home')
+  })
+
+  watch(jsonData,() => {
+    console.log(111, typeof jsonData.value)
+    console.log(222, jsonData.value)
+    serializationJsonData.value = jSONParse(jsonData.value)
   })
 
 
@@ -58,7 +62,7 @@
       <a-textarea
         v-model:value="jsonData"
         placeholder="Autosize height with minimum and maximum number of lines"
-        :auto-size="{ minRows: 50, maxRows: 5 }"
+        :auto-size="{ minRows: 25, maxRows: 5 }"
       />
     </div>
     <div :key="2">
@@ -83,6 +87,8 @@
   padding: 26px;
   div{
     width: 50%;
+    height: 600px;
+    overflow-y: auto;
   }
 }
 </style>
