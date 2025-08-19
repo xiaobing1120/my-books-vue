@@ -19,6 +19,7 @@
     ]
   }
 
+  const previewMode = ref(true)
   const jsonData = ref(JSON.stringify(data))
   const serializationJsonData = ref(data)
 
@@ -52,7 +53,6 @@
     serializationJsonData.value = jSONParse(jsonData.value)
   })
 
-
 </script>
 
 <template>
@@ -62,18 +62,18 @@
       <a-textarea
         v-model:value="jsonData"
         placeholder="Autosize height with minimum and maximum number of lines"
-        :auto-size="{ minRows: 25, maxRows: 5 }"
       />
     </div>
     <div :key="2">
       <json-viewer
         :value="serializationJsonData"
-        :expand-depth=5
+        :expand-depth=100
         copyable
         boxed
         sort
         show-array-index
-        style="width: 100%"
+        :preview-mode="previewMode"
+        style="width: 100%; height: 100%"
       />
     </div>
   </div>
@@ -87,8 +87,11 @@
   padding: 26px;
   div{
     width: 50%;
-    height: 600px;
+    height: 100%;
     overflow-y: auto;
+    .ant-input{
+      height: 100%;
+    }
   }
 }
 </style>
