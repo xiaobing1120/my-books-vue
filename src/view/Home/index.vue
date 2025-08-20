@@ -1,5 +1,6 @@
 <script setup>
   import { onMounted, defineOptions, ref, watch } from 'vue'
+  import JsonView from './JsonView.vue'
   defineOptions({
     name: 'Home'
   })
@@ -47,11 +48,11 @@
     console.log('Home')
   })
 
-  watch(jsonData,() => {
+  /*watch(jsonData,() => {
     console.log(111, typeof jsonData.value)
     console.log(222, jsonData.value)
     serializationJsonData.value = jSONParse(jsonData.value)
-  })
+  })*/
 
 </script>
 
@@ -65,15 +66,20 @@
       />
     </div>
     <div :key="2">
-      <json-viewer
+<!--      <json-viewer
         :value="serializationJsonData"
         :expand-depth=100
+        :copyable="{ copyText: '复制', copiedText: '复制成功' }"
         copyable
         boxed
-        sort
+        :sort="false"
         show-array-index
-        :preview-mode="previewMode"
+        expanded
         style="width: 100%; height: 100%"
+        theme="my-awesome-json-theme"
+      />-->
+      <JsonView
+        :value="jsonData"
       />
     </div>
   </div>
@@ -85,13 +91,83 @@
   height: 100%;
   display: flex;
   padding: 26px;
-  div{
+  gap: 18px;
+  > div{
     width: 50%;
     height: 100%;
     overflow-y: auto;
     .ant-input{
       height: 100%;
+      font-size: 14px;
+    }
+    /deep/ .jv-more{
+      display: none;
+    }
+
+  }
+}
+
+
+.my-awesome-json-theme {
+  background: #fff;
+  white-space: nowrap;
+  color: #525252;
+  font-family: Consolas, Menlo, Courier, monospace;
+
+  /deep/ .jv-code {
+    .jv-node{
+      font-size: 14px;
+      position: relative;
+
+      // border-left: 1px dashed #bbb;
+      span{
+        font-size: 14px;
+      }
+      .jv-node{
+        margin-left: 28px;
+      }
+    }
+    .jv-toggle {
+      &:before {
+        padding: 0 2px;
+        border-radius: 2px;
+      }
+      &:hover {
+        &:before {
+          background: #eee;
+        }
+      }
+    }
+    .jv-ellipsis {
+      color: #999;
+      background-color: #eee;
+      display: inline-block;
+      line-height: 0.9;
+      font-size: 0.9em;
+      padding: 0px 4px 2px 4px;
+      border-radius: 3px;
+      vertical-align: 2px;
+      cursor: pointer;
+      user-select: none;
+    }
+    .jv-button { color: #49b3ff }
+    .jv-key { color: #111111 }
+    .jv-item {
+      &.jv-array { color: #111111 }
+      &.jv-boolean { color: #fc1e70 }
+      &.jv-function { color: #067bca }
+      &.jv-number { color: #fc1e70 }
+      &.jv-number-float { color: #fc1e70 }
+      &.jv-number-integer { color: #fc1e70 }
+      &.jv-object { color: #111111 }
+      &.jv-undefined { color: #e08331 }
+      &.jv-string {
+        color: #42b983;
+        word-break: break-word;
+        white-space: normal;
+      }
     }
   }
+
 }
 </style>
