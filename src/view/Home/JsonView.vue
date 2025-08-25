@@ -23,7 +23,6 @@
     const fn = () => {
       return Object.keys(data).map(key => {
         return `
-          ${}
           <div class="item">
             <span class="quote">"</span>
             <span class="key">${key}</span>

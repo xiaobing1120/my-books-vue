@@ -10,6 +10,8 @@
 
 <template>
   <h1>About</h1>
+  <h1>Hello, Color Scheme!</h1>
+  <input type="text" placeholder="输入内容">
 </template>
 
 <style scoped lang="less">
