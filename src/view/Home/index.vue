@@ -7,18 +7,21 @@
 
   const data = {
     "name": "John",
+  }
+  /*{
+    "name": "John",
     "age": 30,
     "car": null,
     "a": {
-      "bc": 123
-    },
-    "b": "{\"cd\":234}",
-    "c": [
-      {
-        "a": "{\"c\":1}"
-      }
-    ]
+    "bc": 123
+  },
+    "b": [
+    {
+      "c": 1
+    }
+  ]
   }
+*/
 
   const previewMode = ref(true)
   const jsonData = ref(JSON.stringify(data))
