@@ -1,25 +1,32 @@
 <script setup>
-  import { onMounted, defineOptions, defineProps, ref, watch, reactive } from 'vue'
-  defineOptions({ name: 'JsonView' })
+import $ from 'jquery'
+import { onMounted, defineOptions, defineProps, ref, watch, reactive } from 'vue'
+defineOptions({ name: 'JsonView' })
 
-  // 父组件参数
-  const props = defineProps({
-    value: { type: String, default: () => '' }
+// 父组件参数
+const props = defineProps({
+  value: { type: String, default: () => '' }
+})
+let jsonData = reactive({})
+let htmlData = ref('')
+
+onMounted(() => {
+  $('body').on('click', '.expand', function () {
+    $(this).toggleClass('hover').parent().find('.kv-list').slideToggle().siblings('.ellipsis').fadeToggle()
   })
-  let jsonData = reactive({})
-  let htmlData = ref('')
+})
 
-  // 是否是数组
-  const isArray = (data) => {
-    return Object.prototype.toString.call(data) ===  '[object Array]'
-  }
-  // 是否是对象
-  const isObject = (data) => {
-    return Object.prototype.toString.call(data) ===  '[object Object]'
-  }
+// 是否是数组
+const isArray = (data) => {
+  return Object.prototype.toString.call(data) ===  '[object Array]'
+}
+// 是否是对象
+const isObject = (data) => {
+  return Object.prototype.toString.call(data) ===  '[object Object]'
+}
 
-  const fnItem = (key,value) => {
-    return `
+const fnItem = (key,value) => {
+  return `
       <div class="item">
         ${isObject(value) ? '<span class="expand"></span>' : ''}
         ${isArray(value) ? '<span class="expand"></span>' : ''}
@@ -37,82 +44,80 @@
         ${(!isObject(value) && !isArray(value)) ? '<span class="comma">,</span>' : ''}
       </div>
     `
-  }
+}
 
-  const fnObject = (data, isChild) => {
-    if(isObject(data)){
-      return `
+const fnObject = (data, isChild) => {
+  if(isObject(data)){
+    return `
           ${isChild ? `
             <span class="expand"></span>
             <span class="brace">{</span>
             <span class="ellipsis"></span>
           ` : ''}
-          ${Object.keys(data).map(key => fnItem(key, data[key])).join('')}
+          <div class="kv-list item">${Object.keys(data).map(key => fnItem(key, data[key])).join('')}</div>
           <span class="brace">}</span>
           <span class="comma">,</span>
       `
-    }
-    if(isArray(data)){
-      return `
+  }
+  if(isArray(data)){
+    return `
         ${isChild ? `
           <span class="expand"></span>
           <span class="brace">[</span>
           <span class="ellipsis"></span>
         ` : ''}
-          <div class="item">${data.map(item => fnObject(item, true))}</div>
+          <div class="kv-list item">${data.map(item => fnObject(item, true)).map(item => `<div class="item">${item}</div>`)}</div>
           <span class="brace">]</span>
           <span class="comma">,</span>
       `
-    }
-    return ''
   }
+  return ''
+}
 
-  const createHtml = (res) => {
-    // Object.prototype.toString.call({})
-    // '[object Object]'  '[object Array]' '[object Number]' '[object String]'
-    // '[object Undefined]' '[object Boolean]'  '[object Null]'
-    console.log('数据', res)
-    return fnObject(res, true)
+const createHtml = (res) => {
+  // Object.prototype.toString.call({})
+  // '[object Object]'  '[object Array]' '[object Number]' '[object String]'
+  // '[object Undefined]' '[object Boolean]'  '[object Null]'
+  return fnObject(res, true)
+}
+
+watch(() => props.value, (value) => {
+  if (!value) return
+  try{
+    let newValue = value.trim();
+    // 2. 处理单引号
+    newValue = newValue.replace(/'/g, '"');
+    // 3. 处理未加引号的键名 (更严格的正则)
+    newValue = newValue.replace(/([{,]\s*)([a-zA-Z_$][a-zA-Z0-9_$]*)(\s*:)/g, '$1"$2"$3');
+    // 4. 移除尾部逗号
+    newValue = newValue.replace(/,\s*([}\]])/g, '$1');
+
+    jsonData = jSONParse(newValue)
+    htmlData.value = createHtml(jsonData)
+  }catch (e) {
+    console.error(e)
   }
+})
 
-  watch(() => props.value, (value) => {
-    if (!value) return
-    try{
-      let newValue = value.trim();
-      // 2. 处理单引号
-      newValue = newValue.replace(/'/g, '"');
-      // 3. 处理未加引号的键名 (更严格的正则)
-      newValue = newValue.replace(/([{,]\s*)([a-zA-Z_$][a-zA-Z0-9_$]*)(\s*:)/g, '$1"$2"$3');
-      // 4. 移除尾部逗号
-      newValue = newValue.replace(/,\s*([}\]])/g, '$1');
-
-      jsonData = jSONParse(newValue)
-      console.log(createHtml(jsonData))
-      htmlData.value = createHtml(jsonData)
-    }catch (e) {
-      console.error(e)
-    }
-  })
-
-  // json 格式化
-  const jSONParse = (str) => {
-    return JSON.parse(str, (key, value) => {
-      // 检查值是否为字符串且内容是有效的JSON
-      if (typeof value === 'string') {
-        try {
-          // 尝试解析字符串为JSON
-          const parsedValue = jSONParse(value);
-          // 如果解析成功，返回解析后的对象
-          return parsedValue;
-        } catch (e) {
-          // 如果解析失败，保持原值
-          return value;
-        }
+// json 格式化
+const jSONParse = (str) => {
+  return JSON.parse(str, (key, value) => {
+    // 检查值是否为字符串且内容是有效的JSON
+    if (typeof value === 'string') {
+      try {
+        // 尝试解析字符串为JSON
+        const parsedValue = jSONParse(value);
+        // 如果解析成功，返回解析后的对象
+        return parsedValue;
+      } catch (e) {
+        // 如果解析失败，保持原值
+        return value;
       }
-      // 非字符串值直接返回
-      return value;
-    })
-  }
+    }
+    // 非字符串值直接返回
+    return value;
+  })
+}
 
 </script>
 
@@ -132,7 +137,6 @@
     font-family: Arial, "Helvetica Neue", Helvetica, Arial, sans-serif;
     color: #444;
     font-size: 0;
-    padding-left: 30px;
     span{
       font: 14px / 18px monospace;
       display: inline-block;
@@ -143,6 +147,10 @@
     .item{
       padding-left: 20px;
       border-left: 1px dashed #999;
+    }
+    .kv-list{
+      padding-left: 0;
+      border-left: 0;
     }
     .number, .null, .undefined{
       font-weight: bold;
@@ -160,11 +168,30 @@
       display: inline-block;
       width: 20px;
       height: 15px;
-      background: red;
       opacity: .3;
       margin-left: -20px;
-      background: url("../../assets/arrow-down1.png") no-repeat center;
-      background-size: auto 100%;
+      cursor: pointer;
+      &::before{
+        content: "";
+        display: block;
+        width: 15px;
+        height: 15px;
+        margin: 0 auto;
+        background: url("../../assets/arrow-down1.png") no-repeat center;
+        background-size: 15px 15px;
+        transition: all .3s ;
+      }
+      &.hover{
+        &::before{
+          transform: rotate(-90deg);
+        }
+      }
+    }
+    .ellipsis{
+      display: none;
+      &::before{
+        content: "...";
+      }
     }
   }
 }

@@ -1,4 +1,5 @@
 <script setup>
+  import $ from 'jquery'
   import { onMounted, defineOptions, defineProps, ref, watch, reactive } from 'vue'
   defineOptions({ name: 'JsonView' })
 
@@ -8,6 +9,12 @@
   })
   let jsonData = reactive({})
   let htmlData = ref('')
+
+  onMounted(() => {
+    $('body').on('click', '.expand', function () {
+      $(this).toggleClass('hover').parent().find('.kv-list').slideToggle().siblings('.ellipsis').fadeToggle()
+    })
+  })
 
   // 是否是数组
   const isArray = (data) => {
@@ -47,7 +54,7 @@
             <span class="brace">{</span>
             <span class="ellipsis"></span>
           ` : ''}
-          ${Object.keys(data).map(key => fnItem(key, data[key])).join('')}
+          <div class="kv-list item">${Object.keys(data).map(key => fnItem(key, data[key])).join('')}</div>
           <span class="brace">}</span>
           <span class="comma">,</span>
       `
@@ -59,7 +66,7 @@
           <span class="brace">[</span>
           <span class="ellipsis"></span>
         ` : ''}
-          <div class="item">${data.map(item => fnObject(item, true))}</div>
+          <div class="kv-list item">${data.map(item => fnObject(item, true)).map(item => `<div class="item">${item}</div>`)}</div>
           <span class="brace">]</span>
           <span class="comma">,</span>
       `
@@ -71,7 +78,6 @@
     // Object.prototype.toString.call({})
     // '[object Object]'  '[object Array]' '[object Number]' '[object String]'
     // '[object Undefined]' '[object Boolean]'  '[object Null]'
-    console.log('数据', res)
     return fnObject(res, true)
   }
 
@@ -87,7 +93,6 @@
       newValue = newValue.replace(/,\s*([}\]])/g, '$1');
 
       jsonData = jSONParse(newValue)
-      console.log(createHtml(jsonData))
       htmlData.value = createHtml(jsonData)
     }catch (e) {
       console.error(e)
@@ -132,7 +137,6 @@
     font-family: Arial, "Helvetica Neue", Helvetica, Arial, sans-serif;
     color: #444;
     font-size: 0;
-    padding-left: 30px;
     span{
       font: 14px / 18px monospace;
       display: inline-block;
@@ -143,6 +147,10 @@
     .item{
       padding-left: 20px;
       border-left: 1px dashed #999;
+    }
+    .kv-list{
+      padding-left: 0;
+      border-left: 0;
     }
     .number, .null, .undefined{
       font-weight: bold;
@@ -160,11 +168,30 @@
       display: inline-block;
       width: 20px;
       height: 15px;
-      background: red;
       opacity: .3;
       margin-left: -20px;
-      background: url("../../assets/arrow-down1.png") no-repeat center;
-      background-size: auto 100%;
+      cursor: pointer;
+      &::before{
+        content: "";
+        display: block;
+        width: 15px;
+        height: 15px;
+        margin: 0 auto;
+        background: url("../../assets/arrow-down1.png") no-repeat center;
+        background-size: 15px 15px;
+        transition: all .3s ;
+      }
+      &.hover{
+        &::before{
+          transform: rotate(-90deg);
+        }
+      }
+    }
+    .ellipsis{
+      display: none;
+      &::before{
+        content: "...";
+      }
     }
   }
 }
