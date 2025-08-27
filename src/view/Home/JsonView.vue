@@ -1,6 +1,8 @@
 <script setup>
   import $ from 'jquery'
   import { onMounted, defineOptions, defineProps, ref, watch, reactive } from 'vue'
+  import Test from './components/test.vue'
+
   defineOptions({ name: 'JsonView' })
 
   // 父组件参数
@@ -11,6 +13,7 @@
   let htmlData = ref('')
 
   onMounted(() => {
+     console.log(';this.value-----------------', props.value)
     $('body').on('click', '.expand', function () {
       $(this).toggleClass('hover').parent().find('.kv-list').slideToggle().siblings('.ellipsis').fadeToggle()
     })
@@ -93,7 +96,7 @@
       newValue = newValue.replace(/,\s*([}\]])/g, '$1');
 
       jsonData = jSONParse(newValue)
-      htmlData.value = createHtml(jsonData)
+      // htmlData.value = createHtml(jsonData)
     }catch (e) {
       console.error(e)
     }
@@ -119,11 +122,13 @@
     })
   }
 
+
 </script>
 
 <template>
   <div class="json-view">
-    <div v-html="htmlData" class="json-view-main"></div>
+<!--    <div v-html="htmlData" class="json-view-main"></div>-->
+    <Test :value="jsonData" />
   </div>
 </template>
 
