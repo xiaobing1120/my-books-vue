@@ -49,14 +49,14 @@
   const fnObject = (data, isChild) => {
     if(isObject(data)){
       return `
-          ${isChild ? `
-            <span class="expand"></span>
-            <span class="brace">{</span>
-            <span class="ellipsis"></span>
-          ` : ''}
-          <div class="kv-list item">${Object.keys(data).map(key => fnItem(key, data[key])).join('')}</div>
-          <span class="brace">}</span>
-          <span class="comma">,</span>
+        ${isChild ? `
+          <span class="expand"></span>
+          <span class="brace">{</span>
+          <span class="ellipsis"></span>
+        ` : ''}
+        <div class="kv-list item">${Object.keys(data).map(key => fnItem(key, data[key])).join('')}</div>
+        <span class="brace">}</span>
+        <span class="comma">,</span>
       `
     }
     if(isArray(data)){
@@ -133,10 +133,33 @@
   color: #666;
 }
 .json-view-main{
+  font-family: Arial, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  color: #444;
+  font-size: 0;
+  .expand{
+    display: inline-block;
+    width: 20px;
+    height: 15px;
+    opacity: .3;
+    margin-left: -20px;
+    cursor: pointer;
+    &::before{
+      content: "";
+      display: block;
+      width: 15px;
+      height: 15px;
+      margin: 0 auto;
+      background: url("../../assets/arrow-down1.png") no-repeat center;
+      background-size: 15px 15px;
+      transition: all .3s ;
+    }
+    &.hover{
+      &::before{
+        transform: rotate(-90deg);
+      }
+    }
+  }
   >div{
-    font-family: Arial, "Helvetica Neue", Helvetica, Arial, sans-serif;
-    color: #444;
-    font-size: 0;
     span{
       font: 14px / 18px monospace;
       display: inline-block;
@@ -164,29 +187,7 @@
     .null{
       color: #ff6b00;
     }
-    .expand{
-      display: inline-block;
-      width: 20px;
-      height: 15px;
-      opacity: .3;
-      margin-left: -20px;
-      cursor: pointer;
-      &::before{
-        content: "";
-        display: block;
-        width: 15px;
-        height: 15px;
-        margin: 0 auto;
-        background: url("../../assets/arrow-down1.png") no-repeat center;
-        background-size: 15px 15px;
-        transition: all .3s ;
-      }
-      &.hover{
-        &::before{
-          transform: rotate(-90deg);
-        }
-      }
-    }
+
     .ellipsis{
       display: none;
       &::before{
