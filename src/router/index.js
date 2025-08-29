@@ -1,10 +1,10 @@
 import { createWebHistory, createRouter } from 'vue-router'
 
 import Layouts from '../layouts'
-import Home from '../view/Home'
-import Test from '../view/Test'
-import About from '../view/About'
-
+import Home from '../view/home'
+import Test from '../view/test'
+import About from '../view/about'
+import Mp3 from '../view/mp3'
 const routes = [
   {
     path: '/',
@@ -12,6 +12,7 @@ const routes = [
     children: [
       { path: '', component: Home },
       { path: '/test', component: Test },
+      { path: '/mp3', component: Mp3 },
     ]
   },
   { path: '/about', component: About },
