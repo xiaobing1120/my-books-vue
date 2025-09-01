@@ -64,10 +64,9 @@
     @timeupdate="onTimeUpdate"
     @ended="onEnded"
   />
-  {{ lyrics }}
 
   <ul v-if="lyrics.length > 0">
-    <li v-if="time >= item.second" v-for="(item, index) in lyrics" :key="index">
+    <li v-if="item.second && time >= item.second" v-for="(item, index) in lyrics" :key="index">
       {{ item.second }} --- {{ item.text }}
     </li>
   </ul>

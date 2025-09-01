@@ -1,7 +1,7 @@
 <script setup>
   import $ from 'jquery'
   import { onMounted, defineOptions, defineProps, ref, watch, reactive } from 'vue'
-  import Test from './components/test.vue'
+  import RecursiveComponent from './components/RecursiveComponent.vue'
 
   defineOptions({ name: 'JsonView' })
 
@@ -128,7 +128,7 @@
 <template>
   <div class="json-view">
 <!--    <div v-html="htmlData" class="json-view-main"></div>-->
-    <Test :value="jsonData" />
+    <RecursiveComponent :json-data="jsonData" />
   </div>
 </template>
 
