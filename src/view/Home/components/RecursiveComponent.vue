@@ -27,30 +27,6 @@
 
 <template>
 <div>
-  <template v-if="jsonData && isObject(jsonData)">
-    <template v-for="(item, index) in Object.keys(jsonData)">
-      <RecursiveComponent
-        v-if="isObject(jsonData[item]) || isArray(jsonData[item])"
-        :keyName="item"
-        :jsonData="jsonData[item]"
-      />
-      <RecursiveComponent
-        v-else
-        :keyName="keyName"
-        :name="item"
-        :value="jsonData[item]"
-        :first="index === 0"
-        :last="Object.keys(jsonData).length -1 === index"
-      />
-    </template>
-  </template>
-  <template v-else-if="jsonData && isArray(jsonData)">
-    <RecursiveComponent
-      v-for="item in jsonData"
-      :json-data="jsonData[item]"
-    />
-  </template>
-  <template v-else>
     <span class="expand"></span>
     <span class="quote" v-if="keyName">"</span>
     <span class="key" v-if="keyName">{{ keyName }}</span>
@@ -60,6 +36,11 @@
     <div class="item" v-if="name || value">
       <span class="string">"{{ name }}"</span>
       <span class="colon">:</span>
+      <div v-if="isObject(value)">
+        <RecursiveComponent
+          :jsonData="value"
+        />
+      </div>
       <span class="number" v-if="typeof value === 'number'">{{ value }}</span>
       <span class="string" v-else-if="typeof value === 'string'">"{{ value }}"</span>
       <span class="null" v-else-if="value === null || typeof value === 'boolean'">null</span>
@@ -67,8 +48,6 @@
     </div>
     <span class="brace" v-if="last">}</span>
     <span class="comma" v-if="last">,</span>
-  </template>
-
 </div>
 </template>
 
