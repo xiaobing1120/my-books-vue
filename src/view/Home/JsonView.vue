@@ -129,7 +129,33 @@
   <div class="json-view">
 <!--    <div v-html="htmlData" class="json-view-main"></div>-->
     <div class="json-view-main">
-      <RecursiveComponent :json-data="jsonData" />
+<!--      <RecursiveComponent :json-data="jsonData" />-->
+      <template v-if="jsonData && isObject(jsonData)">
+        <div class="list">
+          <template v-for="(item, index) in Object.keys(jsonData)">
+            <RecursiveComponent
+              v-if="isObject(jsonData[item])"
+              :keyName="item"
+              :json-data="jsonData[item]"
+            />
+            <!--        <RecursiveComponent
+                      v-else-if="isArray(jsonData[item])"
+                      :keyName="item"
+                      :isArr="true"
+                      :json-data="jsonData[item]"
+                    />-->
+            <RecursiveComponent
+              v-else
+              :name="item"
+              :value="jsonData[item]"
+              :first="index === 0"
+              :last="Object.keys(jsonData).length -1 === index"
+            />
+
+          </template>
+        </div>
+      </template>
+
     </div>
 <!--    <template v-if="jsonData && isObject(jsonData)">
       <template v-for="(item, index) in Object.keys(jsonData)">
