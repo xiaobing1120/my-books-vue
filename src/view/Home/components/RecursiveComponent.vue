@@ -27,38 +27,46 @@
 </script>
 
 <template>
-  <template v-if="jsonData && isObject(jsonData)">
-    <span class="brace">{</span>
-    <span class="ellipsis"></span>
-    <div class="k-list">
-      <template v-for="(item, index) in Object.keys(jsonData)">
-        <RecursiveComponent
-          :keyName="keyName"
-          :name="item"
-          :value="jsonData[item]"
-          :first="index === 0"
-          :last="Object.keys(jsonData).length -1 === index"
-        />
-      </template>
+  <template v-if="jsonData && (isObject(jsonData) || isArray(jsonData))">
+    <div>
+      <span class="expand"></span>
+      <span class="key" v-if="keyName">"{{ keyName }}"</span>
+      <span class="colon" v-if="keyName">:</span>
+      <span class="brace" v-if="isObject(jsonData)">{</span>
+      <span class="brace" v-else>[</span>
+      <span class="ellipsis"></span>
+      <div class="kv-list">
+        <template v-for="(item, index) in Object.keys(jsonData)">
+          <RecursiveComponent
+            v-if="isObject(jsonData[item])"
+            :keyName="isArray(jsonData) ? '' : item"
+            :jsonData="jsonData[item]"
+            :first="index === 0"
+            :last="isArray(jsonData) ? (jsonData.length - 1 === index) : Object.keys(jsonData).length -1 === index"
+          />
+          <template v-else-if="isArray(jsonData[item])">
+            <RecursiveComponent
+              :keyName="item"
+              :jsonData="jsonData[item]"
+            />
+          </template>
+          <RecursiveComponent
+            v-else
+            :name="item"
+            :value="jsonData[item]"
+            :first="index === 0"
+            :last="Object.keys(jsonData).length -1 === index"
+          />
+          <!--          :first="index === 0"
+                    :last="Object.keys(jsonData).length -1 === index"-->
+        </template>
+      </div>
+      <span class="brace" v-if="isObject(jsonData)">}</span>
+      <span class="brace" v-else>]</span>
+      <span class="comma" v-if="!last">,</span>
     </div>
-    <span class="brace">}</span>
-    <span class="comma">,</span>
   </template>
-<!--  <template v-else-if="jsonData && isArray(jsonData)">
-    <template v-for="(item, index) in jsonData">
-      <RecursiveComponent
-        :json-data="item"
-      />
-    </template>
-  </template>-->
-  <template v-else>
-    <span class="expand" v-if="keyName && first"></span>
-    <span class="quote" v-if="keyName && first">"</span>
-    <span class="key" v-if="keyName && first">{{ keyName }}</span>
-    <span class="quote" v-if="keyName && first">"</span>
-    <span class="colon" v-if="keyName && first">:</span>
-    <span class="brace" v-if="first">{</span>
-    <span class="ellipsis" v-if="keyName && first"></span>
+  <template v-else-if="name || value">
     <div class="item" v-if="name || value">
       <span class="string">"{{ name }}"</span>
       <span class="colon">:</span>

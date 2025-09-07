@@ -130,32 +130,10 @@
 <!--    <div v-html="htmlData" class="json-view-main"></div>-->
     <div class="json-view-main">
 <!--      <RecursiveComponent :json-data="jsonData" />-->
-      <template v-if="jsonData && isObject(jsonData)">
-        <div class="list">
-          <template v-for="(item, index) in Object.keys(jsonData)">
-            <RecursiveComponent
-              v-if="isObject(jsonData[item])"
-              :keyName="item"
-              :json-data="jsonData[item]"
-            />
-            <!--        <RecursiveComponent
-                      v-else-if="isArray(jsonData[item])"
-                      :keyName="item"
-                      :isArr="true"
-                      :json-data="jsonData[item]"
-                    />-->
-            <RecursiveComponent
-              v-else
-              :name="item"
-              :value="jsonData[item]"
-              :first="index === 0"
-              :last="Object.keys(jsonData).length -1 === index"
-            />
 
-          </template>
-        </div>
-      </template>
-
+        <RecursiveComponent
+          :jsonData="jsonData"
+        />
     </div>
 <!--    <template v-if="jsonData && isObject(jsonData)">
       <template v-for="(item, index) in Object.keys(jsonData)">
@@ -198,6 +176,15 @@
   font-family: Arial, "Helvetica Neue", Helvetica, Arial, sans-serif;
   color: #444;
   font-size: 0;
+  >div{
+    div{
+      padding-left: 22px;
+    }
+  }
+  span{
+    font: 14px / 18px monospace;
+    display: inline-block;
+  }
   .expand{
     display: inline-block;
     width: 20px;
@@ -221,44 +208,40 @@
       }
     }
   }
-  >div{
-    span{
-      font: 14px / 18px monospace;
-      display: inline-block;
-    }
-    .brace{
-      font-weight: bold;
-    }
-    .list{
-      padding-left: 20px;
-    }
-    .item{
-      padding-left: 20px;
-      border-left: 1px dashed #999;
-    }
-    .kv-list{
-      padding-left: 0;
-      border-left: 0;
-    }
-    .number, .null, .undefined{
-      font-weight: bold;
-    }
-    .number{
-      color: #1a01cc;
-    }
-    .string{
-      color: #0b7500;
-    }
-    .null{
-      color: #ff6b00;
-    }
 
-    .ellipsis{
-      display: none;
-      &::before{
-        content: "...";
-      }
+  .brace{
+    font-weight: bold;
+  }
+  .list{
+    padding-left: 20px;
+  }
+  .item{
+    padding-left: 20px;
+    border-left: 1px dashed #999;
+  }
+  .kv-list{
+    padding-left: 0 !important;
+    border-left: 0;
+  }
+  .number, .null, .undefined{
+    font-weight: bold;
+  }
+  .number{
+    color: #1a01cc;
+  }
+  .string{
+    color: #0b7500;
+  }
+  .null{
+    color: #ff6b00;
+  }
+
+  .ellipsis{
+    display: none;
+    &::before{
+      content: "...";
     }
   }
+
 }
 </style>
