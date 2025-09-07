@@ -48,6 +48,8 @@
             <RecursiveComponent
               :keyName="item"
               :jsonData="jsonData[item]"
+              :first="index === 0"
+              :last="Object.keys(jsonData).length -1 === index"
             />
           </template>
           <RecursiveComponent
@@ -63,7 +65,7 @@
       </div>
       <span class="brace" v-if="isObject(jsonData)">}</span>
       <span class="brace" v-else>]</span>
-      <span class="comma" v-if="!last">,</span>
+      <span class="comma" v-if="!last && (first !== last)">,</span>
     </div>
   </template>
   <template v-else-if="name || value">
