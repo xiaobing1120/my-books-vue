@@ -54,8 +54,8 @@
           </template>
           <RecursiveComponent
             v-else
-            :name="item"
-            :value="jsonData[item]"
+            :name="isArray(jsonData) ? jsonData[item] : item"
+            :value="isArray(jsonData) ? '' : jsonData[item]"
             :first="index === 0"
             :last="Object.keys(jsonData).length -1 === index"
           />
