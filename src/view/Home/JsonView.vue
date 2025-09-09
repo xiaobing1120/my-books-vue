@@ -127,43 +127,9 @@
 
 <template>
   <div class="json-view">
-<!--    <div v-html="htmlData" class="json-view-main"></div>-->
     <div class="json-view-main">
-<!--      <RecursiveComponent :json-data="jsonData" />-->
-
-        <RecursiveComponent
-          :jsonData="jsonData"
-        />
+      <RecursiveComponent :jsonData="jsonData" />
     </div>
-<!--    <template v-if="jsonData && isObject(jsonData)">
-      <template v-for="(item, index) in Object.keys(jsonData)">
-&lt;!&ndash;        <RecursiveComponent
-          v-if="isObject(jsonData[item]) || isArray(jsonData[item])"
-          :keyName="item"
-          :jsonData="jsonData[item]"
-        />
-        <RecursiveComponent
-          v-else
-          :keyName="keyName"
-          :name="item"
-          :value="jsonData[item]"
-          :first="index === 0"
-          :last="Object.keys(jsonData).length -1 === index"
-        />&ndash;&gt;
-        <RecursiveComponent
-          :name="item"
-          :value="jsonData[item]"
-          :first="index === 0"
-          :last="Object.keys(jsonData).length -1 === index"
-        />
-      </template>
-    </template>
-    <template v-else-if="jsonData && isArray(jsonData)">
-      <RecursiveComponent
-        v-for="item in jsonData"
-        :json-data="jsonData[item]"
-      />
-    </template>-->
   </div>
 </template>
 
@@ -177,9 +143,6 @@
   color: #444;
   font-size: 0;
   >div{
-    div{
-      padding-left: 22px;
-    }
   }
   span{
     font: 14px / 18px monospace;
@@ -212,16 +175,10 @@
   .brace{
     font-weight: bold;
   }
-  .list{
-    padding-left: 20px;
-  }
-  .item{
-    padding-left: 20px;
-    border-left: 1px dashed #999;
-  }
   .kv-list{
-    padding-left: 0 !important;
-    border-left: 0;
+    border-left: 1px dashed #999;
+    padding-left: 20px;
+    margin-left: 2px;
   }
   .number, .null, .undefined{
     font-weight: bold;

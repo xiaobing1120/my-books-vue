@@ -59,8 +59,6 @@
             :first="index === 0"
             :last="Object.keys(jsonData).length -1 === index"
           />
-          <!--          :first="index === 0"
-                    :last="Object.keys(jsonData).length -1 === index"-->
         </template>
       </div>
       <span class="brace" v-if="isObject(jsonData)">}</span>
