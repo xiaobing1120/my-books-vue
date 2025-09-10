@@ -1,37 +1,38 @@
 <script setup>
-  import { onMounted, defineOptions, ref, watch } from 'vue'
-  import JsonView from './JsonView.vue'
+  import {onMounted, defineOptions, ref, watch, reactive} from 'vue'
+  import JsonView from './components/JsonView.vue'
   defineOptions({
     name: 'Home'
   })
 
   const data = {
-    "name": "John",
+    "name": "John123",
+    "abc": {
+      "a": 1
+    },
+    "def": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      {
+        "ghi": "123456"
+      },
+      [6,7,8,9,10]
+    ]
   }
-  /*{
-    "name": "John",
-    "age": 30,
-    "car": null,
-    "a": {
-    "bc": 123
-  },
-    "b": [
-    {
-      "c": 1
-    }
-  ]
-  }
-*/
 
-  const previewMode = ref(true)
-  const jsonData = ref(JSON.stringify(data))
-  const serializationJsonData = ref(data)
+  const value = ref(JSON.stringify(data))
+  let jsonData = reactive({})
 
+
+
+  // json 格式化
   const jSONParse = (str) => {
     return JSON.parse(str, (key, value) => {
       // 检查值是否为字符串且内容是有效的JSON
       if (typeof value === 'string') {
-        console.log(333, value)
         try {
           // 尝试解析字符串为JSON
           const parsedValue = jSONParse(value);
@@ -47,43 +48,45 @@
     })
   }
 
+  watch(value, (newValue) => {
+    console.log('newValue', newValue)
+    if (!newValue) return
+    try{
+      let processedValue = newValue.trim();
+      // 2. 处理单引号
+      processedValue = processedValue.replace(/'/g, '"');
+      // 3. 处理未加引号的键名 (更严格的正则)
+      processedValue = processedValue.replace(/([{,]\s*)([a-zA-Z_$][a-zA-Z0-9_$]*)(\s*:)/g, '$1"$2"$3');
+      // 4. 移除尾部逗号
+      processedValue = processedValue.replace(/,\s*([}\]])/g, '$1');
+
+      jsonData = jSONParse(processedValue)
+      console.log(jsonData, 111)
+      // htmlData.value = createHtml(jsonData)
+    }catch (e) {
+      console.error(e)
+    }
+  })
+
   onMounted(() => {
     console.log('Home')
   })
-
-  /*watch(jsonData,() => {
-    console.log(111, typeof jsonData.value)
-    console.log(222, jsonData.value)
-    serializationJsonData.value = jSONParse(jsonData.value)
-  })*/
-
 </script>
 
 <template>
-<!--  <h1>Home</h1>-->
   <div class="card">
     <div :key="1">
       <a-textarea
-        v-model:value="jsonData"
+        v-model:value="value"
         placeholder="Autosize height with minimum and maximum number of lines"
       />
     </div>
     <div :key="2">
-<!--      <json-viewer
-        :value="serializationJsonData"
-        :expand-depth=100
-        :copyable="{ copyText: '复制', copiedText: '复制成功' }"
-        copyable
-        boxed
-        :sort="false"
-        show-array-index
-        expanded
-        style="width: 100%; height: 100%"
-        theme="my-awesome-json-theme"
-      />-->
-      <JsonView
-        :value="jsonData"
-      />
+      <div class="json-view">
+        <div class="json-view-main">
+          <JsonView :jsonData="jsonData" />
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -103,74 +106,8 @@
       height: 100%;
       font-size: 14px;
     }
-    /deep/ .jv-more{
-      display: none;
-    }
 
   }
 }
 
-
-.my-awesome-json-theme {
-  background: #fff;
-  white-space: nowrap;
-  color: #525252;
-  font-family: Consolas, Menlo, Courier, monospace;
-
-  /deep/ .jv-code {
-    .jv-node{
-      font-size: 14px;
-      position: relative;
-
-      // border-left: 1px dashed #bbb;
-      span{
-        font-size: 14px;
-      }
-      .jv-node{
-        margin-left: 28px;
-      }
-    }
-    .jv-toggle {
-      &:before {
-        padding: 0 2px;
-        border-radius: 2px;
-      }
-      &:hover {
-        &:before {
-          background: #eee;
-        }
-      }
-    }
-    .jv-ellipsis {
-      color: #999;
-      background-color: #eee;
-      display: inline-block;
-      line-height: 0.9;
-      font-size: 0.9em;
-      padding: 0px 4px 2px 4px;
-      border-radius: 3px;
-      vertical-align: 2px;
-      cursor: pointer;
-      user-select: none;
-    }
-    .jv-button { color: #49b3ff }
-    .jv-key { color: #111111 }
-    .jv-item {
-      &.jv-array { color: #111111 }
-      &.jv-boolean { color: #fc1e70 }
-      &.jv-function { color: #067bca }
-      &.jv-number { color: #fc1e70 }
-      &.jv-number-float { color: #fc1e70 }
-      &.jv-number-integer { color: #fc1e70 }
-      &.jv-object { color: #111111 }
-      &.jv-undefined { color: #e08331 }
-      &.jv-string {
-        color: #42b983;
-        word-break: break-word;
-        white-space: normal;
-      }
-    }
-  }
-
-}
 </style>

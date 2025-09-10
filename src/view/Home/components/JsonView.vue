@@ -11,7 +11,7 @@
     first: { type: Boolean, required: false, default: () => false },
     last: { type: Boolean, required: false, default: () => false },
     jsonData: { type: [Array, Object], required: false, default: () => undefined },
-    isArr: { type: Boolean, required: false, default: () => false },
+    hideName: { type: Boolean, required: false, default: () => false },
   })
 
   // 是否是数组
@@ -22,7 +22,6 @@
   const isObject = (data) => {
     return Object.prototype.toString.call(data) ===  '[object Object]'
   }
-
 
 </script>
 
@@ -52,13 +51,22 @@
               :last="Object.keys(jsonData).length -1 === index"
             />
           </template>
-          <RecursiveComponent
-            v-else
-            :name="isArray(jsonData) ? jsonData[item] : item"
-            :value="isArray(jsonData) ? '' : jsonData[item]"
-            :first="index === 0"
-            :last="Object.keys(jsonData).length -1 === index"
-          />
+          <template v-else>
+            <RecursiveComponent
+              v-if="isArray(jsonData)"
+              :hide-name="true"
+              :value="jsonData[item]"
+              :first="index === 0"
+              :last="jsonData.length -1 === index"
+            />
+            <RecursiveComponent
+              v-else
+              :name="item"
+              :value="jsonData[item]"
+              :first="index === 0"
+              :last="Object.keys(jsonData).length -1 === index"
+            />
+          </template>
         </template>
       </div>
       <span class="brace" v-if="isObject(jsonData)">}</span>
@@ -68,8 +76,8 @@
   </template>
   <template v-else-if="name || value">
     <div class="item" v-if="name || value">
-      <span class="string">"{{ name }}"</span>
-      <span class="colon">:</span>
+      <span class="string" v-if="!hideName">"{{ name }}"</span>
+      <span class="colon" v-if="!hideName">:</span>
       <span class="string" v-if="typeof value === 'string'">"{{ value }}"</span>
       <span class="number" v-else-if="typeof value === 'number'">{{ value }}</span>
       <span class="null" v-else-if="value === null || typeof value === 'boolean'">null</span>
