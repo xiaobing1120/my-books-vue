@@ -1,5 +1,5 @@
 <script setup>
-  import { defineOptions, defineProps } from "vue";
+  import { defineOptions, defineProps, ref } from "vue";
 
   defineOptions({
     name: 'RecursiveComponent' // 组件名称
@@ -13,6 +13,7 @@
     jsonData: { type: [Array, Object], required: false, default: () => undefined },
     hideName: { type: Boolean, required: false, default: () => false },
   })
+  const open = ref(true)
 
   // 是否是数组
   const isArray = (data) => {
@@ -28,13 +29,13 @@
 <template>
   <template v-if="jsonData && (isObject(jsonData) || isArray(jsonData))">
     <div>
-      <span class="expand"></span>
+      <span class="expand" @click="open = !open"></span>
       <span class="key" v-if="keyName">"{{ keyName }}"</span>
       <span class="colon" v-if="keyName">:</span>
       <span class="brace" v-if="isObject(jsonData)">{</span>
       <span class="brace" v-else>[</span>
-      <span class="ellipsis"></span>
-      <div class="kv-list">
+      <span class="ellipsis" v-show="!open"></span>
+      <div class="kv-list" v-show="open">
         <template v-for="(item, index) in Object.keys(jsonData)">
           <RecursiveComponent
             v-if="isObject(jsonData[item])"

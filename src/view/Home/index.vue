@@ -26,8 +26,6 @@
   const value = ref(JSON.stringify(data))
   let jsonData = reactive({})
 
-
-
   // json 格式化
   const jSONParse = (str) => {
     return JSON.parse(str, (key, value) => {
@@ -62,7 +60,6 @@
 
       jsonData = jSONParse(processedValue)
       console.log(jsonData, 111)
-      // htmlData.value = createHtml(jsonData)
     }catch (e) {
       console.error(e)
     }
@@ -108,6 +105,80 @@
     }
 
   }
+}
+
+.json-view{
+  width: 100%;
+  height: 100%;
+  color: #666;
+}
+.json-view-main{
+  width: 100%;
+  height: 100%;
+  font-family: Arial, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  color: #444;
+  font-size: 0;
+  :deep div {
+    span{
+      font: 14px / 18px monospace;
+      display: inline-block;
+    }
+
+    .expand{
+      display: inline-block;
+      width: 20px;
+      height: 15px;
+      opacity: .3;
+      margin-left: -20px;
+      cursor: pointer;
+      &::before{
+        content: "";
+        display: block;
+        width: 15px;
+        height: 15px;
+        margin: 0 auto;
+        background: url("../../assets/arrow-down1.png") no-repeat center;
+        background-size: 15px 15px;
+        transition: all .3s ;
+      }
+      &.hover{
+        &::before{
+          transform: rotate(-90deg);
+        }
+      }
+    }
+
+    .brace{
+      font-weight: bold;
+    }
+    .kv-list{
+      border-left: 1px dashed #999;
+      padding-left: 20px;
+      margin-left: 2px;
+    }
+    .number, .null, .undefined{
+      font-weight: bold;
+    }
+    .number{
+      color: #1a01cc;
+    }
+    .string{
+      color: #0b7500;
+    }
+    .null{
+      color: #ff6b00;
+    }
+
+    .ellipsis{
+      &::before{
+        content: "...";
+      }
+    }
+
+
+  }
+
+
 }
 
 </style>
